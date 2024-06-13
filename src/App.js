@@ -38,7 +38,7 @@ function App() {
                 }
               /> */}
             <Route path="/" element={<Main />} />
-            <Route path="/play/:playId" element={<Play />} />
+            <Route path="/play/:gameId" element={<Play />} />
             <Route path="/game/:id" element={<Game />} />
             <Route path="/search/:text" element={<Search />} />
           </Routes>

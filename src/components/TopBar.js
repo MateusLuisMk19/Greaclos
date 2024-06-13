@@ -14,7 +14,7 @@ const TopBar = (tb) => {
   const navigate = useNavigate();
 
   const myClasses = tb.float
-    ? "h-14 absolute end-0 w-1/2 flex flex-row " + tb.classes
+    ? "h-14 absolute end-0 w-1/2 flex flex-row z-40 " + tb.classes
     : "h-14 flex flex-row " + tb.classes;
 
   function onSearch(data) {
@@ -76,6 +76,26 @@ const TopBar = (tb) => {
               <p className="font-medium">myemail@gmail.com</p>
             </div>
           </div>
+        </div>
+      </div>
+    );
+  } else if (tb.page == "play") {
+    return (
+      <div /* className={myClasses} */>
+        <div className="px-4 py-4 flex">
+          <div className="rounded-full w-12 h-12 bg-white"></div>
+          <div className="ml-4 text-white">
+            <p className="font-extrabold ">myusername98</p>
+            <p className="font-medium text-sm">myemail@gmail.com</p>
+          </div>
+        </div>
+
+        <div className="basis-1/2 space-x-3  flex justify-center py-2">
+          <RoundedButton size={10} value={<HiOutlineEnvelope size={25} />} />
+          <RoundedButton
+            size={10}
+            value={<MdOutlineNotificationsActive size={25} />}
+          />
         </div>
       </div>
     );

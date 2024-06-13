@@ -2,7 +2,7 @@ import React from "react";
 import ttt_img from "../tictactoe.png";
 import { useNavigate } from "react-router-dom";
 
-const Actualy = (props) => {
+const Actually = (props) => {
   const myClasses = "space-4 overflow-x-auto flex ";
   const navigate = useNavigate();
 
@@ -11,50 +11,44 @@ const Actualy = (props) => {
       id: "Ihd65dgnjdu",
       nome: "TicTacToe",
       img: "https://img.freepik.com/free-vector/hands-holding-pencils-play-tic-tac-toe-people-drawing-crosses-noughts-simple-game-children-flat-vector-illustration-strategy-concept-banner-website-design-landing-web-page_74855-24786.jpg",
-      link: "",
     },
     {
       id: "Ihd65dgnjdu",
       nome: "Mario",
       img: "https://img2.rtve.es/i/?w=1600&i=1632450182030.jpg",
-      link: "",
     },
     {
       id: "Ihd65dgnjdu",
       nome: "Tira",
       img: "https://img2.rtve.es/i/?w=1600&i=1632450182030.jpg",
-      link: "",
     },
     {
       id: "Ihd65dgnjdu",
       nome: "Damas",
       img: "https://img2.rtve.es/i/?w=1600&i=1632450182030.jpg",
-      link: "",
     },
     {
       id: "Ihd65dgnjdu",
       nome: "Xadrez",
       img: "https://img2.rtve.es/i/?w=1600&i=1632450182030.jpg",
-      link: "",
     },
     {
       id: "Ihd65dgnjdu",
       nome: "Jato",
       img: "https://img2.rtve.es/i/?w=1600&i=1632450182030.jpg",
-      link: "",
     },
     {
       id: "Ihd65dgnjdu",
       nome: "Carros",
       img: "https://img2.rtve.es/i/?w=1600&i=1632450182030.jpg",
-      link: "",
     },
   ];
 
   const handleClickGame = (data) => {
     const { id } = data;
+
     //console.log(id);
-    navigate(`/game/:${id}`);
+    navigate(`/game/${id}`);
   };
 
   const game = (game) => {
@@ -78,11 +72,13 @@ const Actualy = (props) => {
       <div className="bg-paleteOne-300 w-56 p-1 my-2 rounded text-white ">
         Actualy Games
       </div>
-      <div className="w-[57.5rem] max-h-52 ">
-        <div className={myClasses}>{myGames.map((myGame) => game(myGame))}</div>
+      <div className="w-[57.5rem] max-h-48 ">
+        <div id="actually-bar" className={myClasses}>
+          {myGames.map((myGame) => game(myGame))}
+        </div>
       </div>
     </div>
   );
 };
 
-export default Actualy;
+export default Actually;

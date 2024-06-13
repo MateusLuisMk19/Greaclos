@@ -2,12 +2,11 @@ import React, { useState, Suspense, lazy } from "react";
 import NavBar from "../components/NavBar";
 
 import { AiFillHome } from "react-icons/ai";
-import { MdGames, MdPeopleAlt, MdFavorite } from "react-icons/md";
+import { MdPeopleAlt, MdFavorite } from "react-icons/md";
 import { BiSolidCategoryAlt } from "react-icons/bi";
 import { RiCommunityFill } from "react-icons/ri";
 
 const Home = lazy(() => import("./Home"));
-const Game = lazy(() => import("./Game"));
 const Category = lazy(() => import("./Category"));
 const Community = lazy(() => import("./Community"));
 const Friends = lazy(() => import("./Friends"));

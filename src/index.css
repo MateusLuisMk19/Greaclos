@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.pub-game {
+  mask-image: linear-gradient(
+    rgb(0 0 0 / 100%),
+    rgb(0 0 0 / 100%),
+    rgb(0 0 0 / 100%),
+    transparent,
+    transparent 90%
+  );
+}
+
+#actually-bar {
+  mask-image:  linear-gradient(to bottom, #333, #333 50%, #eee 93%, transparent 93%);
+}
+
+#start-game{
+  min-width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

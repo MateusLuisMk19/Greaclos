@@ -1,30 +1,17 @@
 import React, { useState } from "react";
 
 function Square({ value, onSquareClick }) {
-  if (value == "X")
-    return (
-      <button
-        onClick={onSquareClick}
-        className="bg-paleteOne-300 w-16 border-2 rounded-md m-1 font-bold text-xl"
-      >
-        {value}
-      </button>
-    );
+  const baseClasses =
+    "w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 border-2 rounded-md m-1 font-bold text-xl flex items-center justify-center";
+  let additionalClasses = "bg-paleteOne-300/20";
 
-  if (value == "O")
-    return (
-      <button
-        onClick={onSquareClick}
-        className="bg-paleteTwo-100/70 w-16 border-2 rounded-md m-1 font-bold text-xl"
-      >
-        {value}
-      </button>
-    );
+  if (value === "X") additionalClasses = "bg-paleteOne-300";
+  if (value === "O") additionalClasses = "bg-paleteTwo-100/70";
 
   return (
     <button
       onClick={onSquareClick}
-      className="bg-paleteOne-300/20 w-16 border-2 rounded-md m-1 font-bold text-xl"
+      className={`${baseClasses} ${additionalClasses}`}
     >
       {value}
     </button>
@@ -48,31 +35,37 @@ function Board({ xIsNext, squares, onPlay }) {
   const winner = calculateWinner(squares);
   let status;
   if (winner) {
-    status = "Winner: " + winner;
+    status = (
+      <div className="bg-paleteTwo-300/50 text-center border-2 border-yellow-200 rounded-md m-1 font-bold text-xl w-full py-2">
+        {"Winner: " + winner}
+      </div>
+    );
   } else {
-    status = "Next player: " + (xIsNext ? "X" : "O");
+    status = (
+      <div className="bg-paleteOne-300/20 text-center border-2 rounded-md m-1 font-bold text-xl w-full py-2">
+        {"Next player: " + (xIsNext ? "X" : "O")}
+      </div>
+    );
   }
 
-  const board_row = "min-h-16 min-w-48 max-h-16 max-w-48 flex flex-row";
+  const boardRow = "flex";
 
   return (
-    <div className="">
-      <div className="bg-paleteOne-300/20 text-center border-2 rounded-md m-1 font-bold text-xl">
-        {status}
-      </div>
+    <div className="flex flex-col items-center">
+      {status}
 
-      <div className="">
-        <div className={board_row}>
+      <div>
+        <div className={boardRow}>
           <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
           <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
           <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
         </div>
-        <div className={board_row}>
+        <div className={boardRow}>
           <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
           <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
           <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
         </div>
-        <div className={board_row}>
+        <div className={boardRow}>
           <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
           <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
           <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
@@ -96,7 +89,6 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-//win
       return squares[a];
     }
   }
@@ -119,17 +111,20 @@ const TicTacToe = ({ style }) => {
     setCurrentMove(nextMove);
   }
 
+  function resetGame() {
+    setHistory([Array(9).fill(null)]);
+    setCurrentMove(0);
+  }
+
   const moves = history.map((squares, move) => {
     let description;
     if (move > 0) {
       description = "Move #" + move;
-    } else {
-      description = "Game start";
     }
     return (
       <li key={move}>
         <button
-        disabled
+          disabled
           className="bg-paleteOne-300/20 text-center border-2 rounded-md m-1 font-medium text-sm"
           onClick={() => jumpTo(move)}
         >
@@ -140,13 +135,17 @@ const TicTacToe = ({ style }) => {
   });
 
   return (
-    <div className={"flex " + style}>
-      <div className="">
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
-      </div>
-      
-      <div className="absolute end-0">
-        <ol>{moves}</ol>
+    <div className={`flex flex-col items-center ${style}`}>
+      <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+
+      <div className="flex flex-col items-center mt-4">
+        <button
+          onClick={resetGame}
+          className="bg-paleteOne-300/20 text-center border-2 rounded-md m-1 font-bold text-xl px-4 py-2"
+        >
+          Reset Game
+        </button>
+        <ol className="absolute top-1/2 end-16">{moves}</ol>
       </div>
     </div>
   );

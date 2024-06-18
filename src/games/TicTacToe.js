@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, memo } from "react";
 
-function Square({ value, onSquareClick }) {
+const Square = memo(({ value, onSquareClick }) => {
   const baseClasses =
-    "w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 border-2 rounded-md m-1 font-bold text-xl flex items-center justify-center";
+    "w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 border-2 rounded-md m-1 font-bold text-6xl flex items-center justify-center";
   let additionalClasses = "bg-paleteOne-300/20";
 
   if (value === "X") additionalClasses = "bg-paleteOne-300";
@@ -12,25 +12,25 @@ function Square({ value, onSquareClick }) {
     <button
       onClick={onSquareClick}
       className={`${baseClasses} ${additionalClasses}`}
+      aria-label={`Square ${value ? value : "empty"}`}
     >
       {value}
     </button>
   );
-}
+});
 
 function Board({ xIsNext, squares, onPlay }) {
-  function handleClick(i) {
-    if (squares[i] || calculateWinner(squares)) {
-      return;
-    }
-    const nextSquares = squares.slice();
-    if (xIsNext) {
-      nextSquares[i] = "X";
-    } else {
-      nextSquares[i] = "O";
-    }
-    onPlay(nextSquares);
-  }
+  const handleClick = useCallback(
+    (i) => {
+      if (squares[i] || calculateWinner(squares)) {
+        return;
+      }
+      const nextSquares = squares.slice();
+      nextSquares[i] = xIsNext ? "X" : "O";
+      onPlay(nextSquares);
+    },
+    [squares, xIsNext, onPlay]
+  );
 
   const winner = calculateWinner(squares);
   let status;
@@ -38,6 +38,12 @@ function Board({ xIsNext, squares, onPlay }) {
     status = (
       <div className="bg-paleteTwo-300/50 text-center border-2 border-yellow-200 rounded-md m-1 font-bold text-xl w-full py-2">
         {"Winner: " + winner}
+      </div>
+    );
+  } else if (!squares.includes(null)) {
+    status = (
+      <div className="bg-paleteOne-300/50 text-center border-2 border-gray-200 rounded-md m-1 font-bold text-xl w-full py-2">
+        {"Draw"}
       </div>
     );
   } else {
@@ -101,20 +107,20 @@ const TicTacToe = ({ style }) => {
   const currentSquares = history[currentMove];
   const xIsNext = currentMove % 2 === 0;
 
-  function handlePlay(nextSquares) {
+  const handlePlay = (nextSquares) => {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
-  }
+  };
 
-  function jumpTo(nextMove) {
+  const jumpTo = (nextMove) => {
     setCurrentMove(nextMove);
-  }
+  };
 
-  function resetGame() {
+  const resetGame = () => {
     setHistory([Array(9).fill(null)]);
     setCurrentMove(0);
-  }
+  };
 
   const moves = history.map((squares, move) => {
     let description;

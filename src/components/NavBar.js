@@ -10,9 +10,9 @@ const NavBar = ({ pages, custom, fake = false, play = false, onClick }) => {
   const [showHelps, setShowHelps] = useState(false);
 
   const Default_Styl =
-    "w-1/4 h-screen bg-gradient-to-b from-[#3E1F47] to-[#272640]";
+    "w-1/4 h-screen bg-gradient-to-b from-[#3E1F47] to-[#272640] z-40";
   const Play_Styl =
-    "w-1/5 h-screen bg-gradient-to-b from-[#3E1F47] to-[#272640] " + custom ;
+    "w-1/5 h-screen bg-gradient-to-b from-[#3E1F47] to-[#272640] z-40 " + custom ;
 
   const navigate = useNavigate();
 

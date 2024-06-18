@@ -11,6 +11,7 @@ const Play = () => {
   const handleDropBar = () => {
     dropBar ? setDropBar("") : setDropBar("absolute end-full");
   };
+  const BACKGROUND = "fixed top-0 bottom-0 w-full bg-black/60 z-10";
 
   const pages = [
     {
@@ -35,15 +36,21 @@ const Play = () => {
     <div className="w-full flex relative">
       <NavBar pages={pages} play custom={dropBar} />
 
-      <div className="flex space-x-8 m-4 text-white z-40 ">
+      {!dropBar && <div className={BACKGROUND} onClick={handleDropBar}></div>}
+
+      {dropBar && <div className="flex space-x-8 m-4 text-white z-10 ">
         <div className="w-6 cursor-pointer">
           <SiGamedeveloper size={35} onClick={handleDropBar} />
         </div>
         <div className="font-black text-3xl cursor-pointer">GREACLOS</div>
-      </div>
+      </div>}
 
       <div className="w-full h-screen absolute bg-orange-500 -z-10">
-        <TicTacToe style={"absolute bottom-1/2 end-1/2  translate-x-1/2 translate-y-1/2 p-36 bg-white rounded-lg space-x-4"}/>
+        <TicTacToe
+          style={
+            "absolute bottom-1/2 end-1/2  translate-x-1/2 translate-y-1/2 px-36 h-screen pt-32 bg-white  space-x-4"
+          }
+        />
       </div>
     </div>
   );

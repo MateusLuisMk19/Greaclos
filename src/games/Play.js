@@ -32,8 +32,8 @@ const Play = () => {
   ];
 
   return (
-    <div className="w-full flex ">
-      <NavBar pages={pages} play={true} custom={dropBar} />
+    <div className="w-full flex relative">
+      <NavBar pages={pages} play custom={dropBar} />
 
       <div className="flex space-x-8 m-4 text-white z-40 ">
         <div className="w-6 cursor-pointer">
@@ -42,10 +42,8 @@ const Play = () => {
         <div className="font-black text-3xl cursor-pointer">GREACLOS</div>
       </div>
 
-      <div id="start-game" className="absolute bg-orange-500 -z-10">
-        <div>
-          <TicTacToe />
-        </div>
+      <div className="w-full h-screen absolute bg-orange-500 -z-10">
+        <TicTacToe style={"absolute bottom-1/2 end-1/2  translate-x-1/2 translate-y-1/2 p-36 bg-white rounded-lg space-x-4"}/>
       </div>
     </div>
   );

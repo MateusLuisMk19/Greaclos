@@ -47,7 +47,8 @@ const Main = () => {
 
   return (
     <>
-      <NavBar pages={pages} onClick={setActivePage} />
+      <NavBar pages={pages} onClick={setActivePage}/>
+
       <div className="w-full bg-red-200 h-screen bg-gradient-to-b from-[#3E1F47] to-[#272640]">
         <Suspense fallback={<p>Loading...</p>}>
           <Page />

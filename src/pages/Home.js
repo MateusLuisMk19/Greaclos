@@ -18,6 +18,7 @@ const Home = () => {
         <Actually />
         <Recently />
       </div>
+
     </div>
   );
 };

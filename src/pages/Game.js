@@ -15,7 +15,7 @@ const Game = (myGame) => {
   const navigate = useNavigate();
   const bg =
     "bg-[url('" +
-    "https://img.freepik.com/free-vector/hands-holding-pencils-play-tic-tac-toe-people-drawing-crosses-noughts-simple-game-children-flat-vector-illustration-strategy-concept-banner-website-design-landing-web-page_74855-24786.jpg" +
+    "https://firebasestorage.googleapis.com/v0/b/greaclos-one.appspot.com/o/games%2FXGT8Y1ckAi8R4Xm0sItl%2Fcover%2Fbackground.png?alt=media&token=148c992a-a5a5-43d4-8195-e64e29dd5d85" +
     "')] bg-center bg-no-repeat bg-cover ";
 
   const pages = [
@@ -35,7 +35,7 @@ const Game = (myGame) => {
   };
   return (
     <>
-      <NavBar pages={pages} fake={true} />
+      <NavBar pages={pages} fake />
       <div className="w-full bg-red-200 h-screen bg-gradient-to-b from-[#3E1F47] to-[#272640]">
         <Suspense fallback={<p>Loading...</p>}>
           <div className="h-screen relative">
@@ -44,7 +44,7 @@ const Game = (myGame) => {
             <div className="h-2/3 relative z-10">
               <img
                 className="w-full absolute -top-1/2 pub-game"
-                src="https://img.freepik.com/free-vector/hands-holding-pencils-play-tic-tac-toe-people-drawing-crosses-noughts-simple-game-children-flat-vector-illustration-strategy-concept-banner-website-design-landing-web-page_74855-24786.jpg"
+                src="https://firebasestorage.googleapis.com/v0/b/greaclos-one.appspot.com/o/games%2FXGT8Y1ckAi8R4Xm0sItl%2Fcover%2Fprofile.jpg?alt=media&token=da2151cf-b560-4d1b-af35-dd2f9a602b30"
                 alt=""
               />
               {/*             
@@ -162,8 +162,8 @@ const Game = (myGame) => {
                         onClick={() => handleFavorite()}
                         className={
                           favorite
-                            ?"text-paleteOne-500 bg-paleteOne-100/90 flex justify-center py-1 w-10 h-10 rounded-xl border-2 border-white hover:text-paleteOne-500 hover:bg-paleteOne-100/50 "
-                            :"text-paleteOne-200 bg-paleteOne-100/30 flex justify-center py-1 w-10 h-10 rounded-xl border-2 border-white hover:text-paleteOne-500 hover:bg-paleteOne-100/50 "
+                            ? "text-paleteOne-500 bg-paleteOne-100/90 flex justify-center py-1 w-10 h-10 rounded-xl border-2 border-white hover:text-paleteOne-500 hover:bg-paleteOne-100/50 "
+                            : "text-paleteOne-200 bg-paleteOne-100/30 flex justify-center py-1 w-10 h-10 rounded-xl border-2 border-white hover:text-paleteOne-500 hover:bg-paleteOne-100/50 "
                         }
                       >
                         {favorite && <MdFavorite size={30} />}

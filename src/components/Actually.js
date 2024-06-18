@@ -1,49 +1,34 @@
-import React from "react";
-import ttt_img from "../tictactoe.png";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useFirestore } from "../hooks/useFirestore";
 
 const Actually = (props) => {
   const myClasses = "space-4 overflow-x-auto flex ";
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+
+  // const val
+  const [myAllGames, setMyAllGames] = useState();
+
+  const {
+    getCollection,
+    loading: loadingData,
+    error: errorData,
+  } = useFirestore();
 
   const myGames = [
-    {
-      id: "Ihd65dgnjdu",
-      nome: "TicTacToe",
-      img: "https://img.freepik.com/free-vector/hands-holding-pencils-play-tic-tac-toe-people-drawing-crosses-noughts-simple-game-children-flat-vector-illustration-strategy-concept-banner-website-design-landing-web-page_74855-24786.jpg",
-    },
-    {
-      id: "Ihd65dgnjdu",
-      nome: "Mario",
-      img: "https://img2.rtve.es/i/?w=1600&i=1632450182030.jpg",
-    },
-    {
-      id: "Ihd65dgnjdu",
-      nome: "Tira",
-      img: "https://img2.rtve.es/i/?w=1600&i=1632450182030.jpg",
-    },
-    {
-      id: "Ihd65dgnjdu",
-      nome: "Damas",
-      img: "https://img2.rtve.es/i/?w=1600&i=1632450182030.jpg",
-    },
-    {
-      id: "Ihd65dgnjdu",
-      nome: "Xadrez",
-      img: "https://img2.rtve.es/i/?w=1600&i=1632450182030.jpg",
-    },
-    {
-      id: "Ihd65dgnjdu",
-      nome: "Jato",
-      img: "https://img2.rtve.es/i/?w=1600&i=1632450182030.jpg",
-    },
-    {
-      id: "Ihd65dgnjdu",
-      nome: "Carros",
-      img: "https://img2.rtve.es/i/?w=1600&i=1632450182030.jpg",
-    },
+    { name: "Mario", img: "#", link: "c" },
+    { name: "TicTacToe", img: "#", link: "ac" },
+    { name: "Damas", img: "#", link: "cs" },
+    { name: "Xadrez", img: "#", link: "dc" },
+    { name: "Jato", img: "#", link: "cf" },
+    { name: "Carros", img: "#", link: "gc" },
+    { name: "Tira o C", img: "#", link: "hc" },
+    { name: "Mão", img: "#", link: "cv" },
   ];
 
+  
   const handleClickGame = (data) => {
     const { id } = data;
 
@@ -52,16 +37,17 @@ const Actually = (props) => {
   };
 
   const game = (game) => {
-    const bg = "bg-[url('" + game.img + "')] bg-center bg-no-repeat bg-cover ";
+    const bg =
+      "bg-[url('https://firebasestorage.googleapis.com/v0/b/greaclos-one.appspot.com/o/games%2FXGT8Y1ckAi8R4Xm0sItl%2Fcover%2Fprofile.jpg?alt=media&token=da2151cf-b560-4d1b-af35-dd2f9a602b30')] bg-center bg-no-repeat bg-cover ";
     return (
       <button
-        key={game.nome}
-        title={game.nome}
+        key={game.name}
+        title={game.name}
         onClick={() => handleClickGame(game)}
         className={"relative min-w-36 h-48 bg-white rounded-lg m-1 " + bg}
       >
         <p className="absolute bottom-2 start-2 text-xl font-bold text-yellow-200">
-          {game.nome}
+          {game.name}
         </p>
       </button>
     );

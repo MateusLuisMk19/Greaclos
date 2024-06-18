@@ -9,20 +9,20 @@ import { HiOutlineEnvelope } from "react-icons/hi2";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
-const TopBar = (tb) => {
+const TopBar = ({page,float,classes}) => {
   const { register, handleSubmit, reset } = useForm();
   const navigate = useNavigate();
 
-  const myClasses = tb.float
-    ? "h-14 absolute end-0 w-1/2 flex flex-row z-40 " + tb.classes
-    : "h-14 flex flex-row " + tb.classes;
+  const myClasses = float
+    ? "h-14 absolute end-0 w-1/2 flex flex-row z-40 " + classes
+    : "h-14 flex flex-row " + classes;
 
   function onSearch(data) {
     const { text } = data;
     navigate(`/search/:${text}`);
   }
 
-  if (tb.page == "home") {
+  if (page == "home") {
     return (
       <div className={myClasses}>
         <form
@@ -57,7 +57,7 @@ const TopBar = (tb) => {
         </div>
       </div>
     );
-  } else if (tb.page == "game") {
+  } else if (page == "game") {
     return (
       <div className={myClasses}>
         <div className="basis-1/2 flex flex-row">
@@ -79,7 +79,7 @@ const TopBar = (tb) => {
         </div>
       </div>
     );
-  } else if (tb.page == "play") {
+  } else if (page == "play") {
     return (
       <div /* className={myClasses} */>
         <div className="px-4 py-4 flex">

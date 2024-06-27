@@ -7,19 +7,33 @@
     rgb(0 0 0 / 100%),
     rgb(0 0 0 / 100%),
     rgb(0 0 0 / 100%),
+    rgb(0 0 0 / 100%),
     transparent,
-    transparent 90%
+    transparent 95%
+  );
+  opacity: 0.6;
+}
+
+#galery-bar {
+  mask-image: linear-gradient(
+    to bottom,
+    #333,
+    #333 50%,
+    #eee 93%,
+    transparent 98%
   );
 }
 
-#actually-bar {
-  mask-image:  linear-gradient(to bottom, #333, #333 50%, #eee 93%, transparent 93%);
-}
-
-#start-game{
+#start-game {
   min-width: 100vw;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.title-game {
+  text-shadow: 1px 1px 2px yellow, 0 0 1em rgb(8, 8, 48),
+    0 0 0.2em rgb(6, 6, 37);
+    
 }

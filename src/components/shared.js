@@ -1,9 +1,25 @@
 import React from "react";
 
-const Modal = ({ isOpen, children, title, close, noStatic = false }) => {
+const Modal = ({
+  isOpen,
+  children,
+  title,
+  close,
+  noStatic = false,
+  size = "md",
+}) => {
+  const mySize =
+    size == "sm"
+      ? "w-1/5"
+      : size == "md"
+      ? "w-1/4"
+      : size == "lg"
+      ? "w-1/3"
+      : "w-1/2";
   const BACKGROUND = "fixed top-0 bottom-0 start-0 end-0 bg-black/60 z-50";
   const CONTAINER =
-    "fixed bottom-1/2 end-1/2 translate-x-1/2 translate-y-1/2 p-36 bg-white rounded-lg z-[60]";
+    "fixed bottom-1/2 end-1/2 translate-x-1/2 translate-y-1/2 bg-white pt-10 p-2 rounded-lg z-[60] " +
+    mySize;
 
   if (isOpen)
     return (

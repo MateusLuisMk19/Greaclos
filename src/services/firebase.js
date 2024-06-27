@@ -10,6 +10,8 @@ const firebaseConfig = {
   storageBucket: "greaclos-one.appspot.com",
   messagingSenderId: "331401141584",
   appId: "1:331401141584:web:cf7211ea4fdb64b0c9a055",
+  databaseURL:
+    "https://greaclos-one-default-rtdb.europe-west1.firebasedatabase.app", // URL atualizada para a região correta
 };
 
 const app = initializeApp(firebaseConfig);

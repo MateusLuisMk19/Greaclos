@@ -18,7 +18,8 @@
       "reviews": [
         {
           "username": "",
-          "comment": ""
+          "comment": "",
+          "note":0
         }
       ]
     },

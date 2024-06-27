@@ -1,12 +1,15 @@
-import React, { useState, useCallback, memo } from "react";
+import React, { useState, useEffect } from "react";
+import { ref, set, onValue, push } from "firebase/database";
+import { rt } from "../services/firebase";
+import { generateRandomId } from "./shared";
 
-const Square = memo(({ value, onSquareClick }) => {
+function Square({ value, onSquareClick }) {
   const baseClasses =
-    "w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 border-2 rounded-md m-1 font-bold text-6xl flex items-center justify-center";
-  let additionalClasses = "bg-paleteOne-300/20";
+    "w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 m-1 border-2 rounded-md font-bold text-6xl";
+  let additionalClasses = "bg-paleteOne-300/40";
 
   if (value === "X") additionalClasses = "bg-paleteOne-300";
-  if (value === "O") additionalClasses = "bg-paleteTwo-100/70";
+  if (value === "O") additionalClasses = "bg-paleteTwo-100/90";
 
   return (
     <button
@@ -17,65 +20,63 @@ const Square = memo(({ value, onSquareClick }) => {
       {value}
     </button>
   );
-});
+}
 
 function Board({ xIsNext, squares, onPlay }) {
-  const handleClick = useCallback(
-    (i) => {
-      if (squares[i] || calculateWinner(squares)) {
-        return;
-      }
-      const nextSquares = squares.slice();
-      nextSquares[i] = xIsNext ? "X" : "O";
-      onPlay(nextSquares);
-    },
-    [squares, xIsNext, onPlay]
-  );
+  // Log para depuração
+  console.log("squares in Board:", squares);
+
+  // Verificação de tipo para garantir que squares seja um array
+  if (!Array.isArray(squares)) {
+    console.error("squares is not an array:", squares);
+    squares = Array(9).fill(null);
+  }
+
+  function handleClick(i) {
+    if (squares[i] || calculateWinner(squares)) {
+      return;
+    }
+    const nextSquares = squares.slice();
+    nextSquares[i] = xIsNext ? "X" : "O";
+    onPlay(nextSquares);
+    // alert(nextSquares);
+  }
 
   const winner = calculateWinner(squares);
   let status;
   if (winner) {
     status = (
-      <div className="bg-paleteTwo-300/50 text-center border-2 border-yellow-200 rounded-md m-1 font-bold text-xl w-full py-2">
+      <div className="bg-paleteTwo-300 text-white text-center border-2 border-yellow-500 rounded-md m-1 font-bold text-xl w-full py-2">
         {"Winner: " + winner}
       </div>
     );
-  } else if (!squares.includes(null)) {
+  } else if (squares.every((square) => square !== null)) {
     status = (
-      <div className="bg-paleteOne-300/50 text-center border-2 border-gray-200 rounded-md m-1 font-bold text-xl w-full py-2">
+      <div className="bg-paleteOne-300 text-white text-center border-2 border-gray-200 rounded-md m-1 font-bold text-xl w-full py-2">
         {"Draw"}
       </div>
     );
   } else {
     status = (
-      <div className="bg-paleteOne-300/20 text-center border-2 rounded-md m-1 font-bold text-xl w-full py-2">
+      <div className="bg-paleteOne-300/40 text-center border-2 rounded-md m-1 font-bold text-xl w-full py-2">
         {"Next player: " + (xIsNext ? "X" : "O")}
       </div>
     );
   }
 
-  const boardRow = "flex";
-
   return (
     <div className="flex flex-col items-center">
       {status}
 
-      <div>
-        <div className={boardRow}>
-          <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
-          <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
-          <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
-        </div>
-        <div className={boardRow}>
-          <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
-          <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
-          <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
-        </div>
-        <div className={boardRow}>
-          <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
-          <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
-          <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
-        </div>
+      <div className="grid grid-cols-3 grid-rows-3">
+        {Array.isArray(squares) &&
+          squares.map((square, i) => (
+            <Square
+              key={i}
+              value={square}
+              onSquareClick={() => handleClick(i)}
+            />
+          ))}
       </div>
     </div>
   );
@@ -101,26 +102,76 @@ function calculateWinner(squares) {
   return null;
 }
 
-const TicTacToe = ({ style }) => {
+const TicTacToe = () => {
+  const [gameId, setGameId] = useState(null);
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
-  const currentSquares = history[currentMove];
+  const currentSquares = history[currentMove] || Array(9).fill(null);
   const xIsNext = currentMove % 2 === 0;
 
-  const handlePlay = (nextSquares) => {
+  useEffect(() => {
+    if (gameId) {
+      const gameRef = ref(rt, `tictactoe/${gameId}`);
+      onValue(gameRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          setHistory(data.history || [Array(9).fill(null)]);
+          setCurrentMove(data.currentMove || 0);
+        }
+      });
+    }
+  }, [gameId]);
+
+  function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
-  };
 
-  const jumpTo = (nextMove) => {
+    if (gameId) {
+      set(ref(rt, `tictactoe/${gameId}`), {
+        history: nextHistory,
+        currentMove: nextHistory.length - 1,
+      });
+    }
+  }
+
+  function jumpTo(nextMove) {
     setCurrentMove(nextMove);
-  };
+  }
 
-  const resetGame = () => {
-    setHistory([Array(9).fill(null)]);
+  function resetGame() {
+    const initialHistory = [Array(9).fill(null)];
+    setHistory(initialHistory);
     setCurrentMove(0);
-  };
+
+    if (gameId) {
+      set(ref(rt, `tictactoe/${gameId}`), {
+        history: initialHistory,
+        currentMove: 0,
+      });
+    }
+  }
+
+  function startGame() {
+    if (!gameId) {
+      const newGameRef = generateRandomId(25); // Irá gerar um ID aleatório de 25 caracteres
+
+      push(ref(rt, "tictactoe"));
+
+      set(ref(rt, `tictactoe/${newGameRef}`), {
+        history: [Array(9).fill(null)],
+        currentMove: 0,
+        xIsNext,
+      });
+      setGameId(newGameRef);
+    } else {
+      resetGame();
+    }
+  }
+
+  function joinGame(id) {
+    setGameId(id);
+  }
 
   const moves = history.map((squares, move) => {
     let description;
@@ -130,7 +181,6 @@ const TicTacToe = ({ style }) => {
     return (
       <li key={move}>
         <button
-          disabled
           className="bg-paleteOne-300/20 text-center border-2 rounded-md m-1 font-medium text-sm"
           onClick={() => jumpTo(move)}
         >
@@ -141,18 +191,29 @@ const TicTacToe = ({ style }) => {
   });
 
   return (
-    <div className={`flex flex-col items-center ${style}`}>
+    <div
+      className={`flex flex-col items-center absolute bottom-1/2 end-1/2 translate-x-1/2 translate-y-1/2 h-screen pt-28 `}
+    >
       <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
 
       <div className="flex flex-col items-center mt-4">
         <button
-          onClick={resetGame}
-          className="bg-paleteOne-300/20 text-center border-2 rounded-md m-1 font-bold text-xl px-4 py-2"
+          onClick={startGame}
+          className="bg-white hover:bg-paleteOne-200 text-center border-2 rounded-md m-1 font-bold text-xl px-4 py-2"
         >
-          Reset Game
+          {gameId ? "Restart Game" : "Start Game"}
         </button>
-        <ol className="absolute top-1/2 end-16">{moves}</ol>
       </div>
+
+      <div className="flex flex-col items-center mt-4">
+        <input
+          type="text"
+          placeholder="Enter Game ID"
+          className="border rounded-md p-2"
+          onBlur={(e) => joinGame(e.target.value)}
+        />
+      </div>
+      {/* <ol className="absolute top-2/3 end-0">{moves}</ol> */}
     </div>
   );
 };

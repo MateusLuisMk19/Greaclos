@@ -2,7 +2,7 @@ import React from "react";
 import Online from "../components/Online";
 import Recently from "../components/Recently";
 import TopBar from "../components/TopBar";
-import Actually from "../components/Actually";
+import GameGalery from "../components/GameGalery";
 
 const Home = () => {
   return (
@@ -15,10 +15,9 @@ const Home = () => {
       </div>
 
       <div className="my-2 h-64 flex">
-        <Actually />
+        <GameGalery />
         <Recently />
       </div>
-
     </div>
   );
 };

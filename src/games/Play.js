@@ -61,7 +61,7 @@ const Play = () => {
         </div>
       )}
 
-      <div className="w-full h-screen absolute bg-orange-500 -z-10">
+      <div className="w-full h-screen absolute bg-orange-500 flex justify-center items-center -z-10">
         {MyGames.map((game, idx) =>
           game.gameId === gameId ? (
             <game.component key={idx} gameId={gameId} />

@@ -14,6 +14,21 @@
   opacity: 0.6;
 }
 
+.home {
+  mask-image: linear-gradient(
+    rgb(0 0 0 / 100%),
+    rgb(0 0 0 / 100%),
+    rgb(0 0 0 / 100%),
+    rgb(0 0 0 / 100%),
+    rgb(0 0 0 / 100%),
+    rgb(0 0 0 / 100%),
+    rgb(0 0 0 / 100%),
+    transparent,
+    transparent 95%
+  );
+  opacity: 0.8;
+}
+
 #galery-bar {
   mask-image: linear-gradient(
     to bottom,
@@ -36,4 +51,27 @@
   text-shadow: 1px 1px 2px yellow, 0 0 1em rgb(8, 8, 48),
     0 0 0.2em rgb(6, 6, 37);
     
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px; /* Largura da barra de rolagem */
+}
+
+.custom-scrollbar.none-bar::-webkit-scrollbar {
+  width: 1px; /* Largura da barra de rolagem */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* Cor de fundo do trilho da barra de rolagem */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #3E1F47; /* Cor da barra de rolagem */
+  border-radius: 20px; /* Arredondamento da barra */
+}
+
+.custom-scrollbar.none-bar::-webkit-scrollbar-thumb {
+  background-color: transparent; /* Cor da barra de rolagem */
+  border-radius: 20px; /* Arredondamento da barra */
 }

@@ -1,221 +1,265 @@
 import React, { useState, useEffect } from "react";
-import { ref, set, onValue, push } from "firebase/database";
-import { rt } from "../services/firebase";
-import { generateRandomId } from "./shared";
+import { calculateWinner, PreviewGame, Square } from "./shared";
 
-function Square({ value, onSquareClick }) {
-  const baseClasses =
-    "w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 m-1 border-2 rounded-md font-bold text-6xl";
-  let additionalClasses = "bg-paleteOne-300/40";
+// Componente principal do Tic-Tac-Toe
+const TicTacToe = () => {
+  // Estados para armazenar as células do tabuleiro e de quem é a vez
+  const [squares, setSquares] = useState(Array(9).fill(null));
+  const [xIsNext, setXIsNext] = useState(true);
+  const [isStarted, setIsStarted] = useState(false);
+  const [isPlayingAgainstAI, setIsPlayingAgainstAI] = useState(false); // Novo estado para modo IA
+  const [aiDifficulty, setAiDifficulty] = useState("easy"); // Novo estado para dificuldade da IA
 
-  if (value === "X") additionalClasses = "bg-paleteOne-300";
-  if (value === "O") additionalClasses = "bg-paleteTwo-100/90";
+  // Estados para pontuação dos jogadores
+  const [xScore, setXScore] = useState(0);
+  const [oScore, setOScore] = useState(0);
 
-  return (
-    <button
-      onClick={onSquareClick}
-      className={`${baseClasses} ${additionalClasses}`}
-      aria-label={`Square ${value ? value : "empty"}`}
-    >
-      {value}
-    </button>
-  );
-}
+  // Calcula o vencedor
+  const { winner, winningSquares } = calculateWinner(squares);
+  const isDraw = squares.every((square) => square !== null) && !winner;
 
-function Board({ xIsNext, squares, onPlay }) {
-  // Log para depuração
-  console.log("squares in Board:", squares);
+  // Lida com o clique em uma célula
+  const handleClick = (i) => {
+    if (squares[i] || winner) return;
 
-  // Verificação de tipo para garantir que squares seja um array
-  if (!Array.isArray(squares)) {
-    console.error("squares is not an array:", squares);
-    squares = Array(9).fill(null);
-  }
-
-  function handleClick(i) {
-    if (squares[i] || calculateWinner(squares)) {
-      return;
-    }
     const nextSquares = squares.slice();
     nextSquares[i] = xIsNext ? "X" : "O";
-    onPlay(nextSquares);
-    // alert(nextSquares);
-  }
+    setSquares(nextSquares);
+    setXIsNext(!xIsNext);
 
-  const winner = calculateWinner(squares);
-  let status;
-  if (winner) {
-    status = (
-      <div className="bg-paleteTwo-300 text-white text-center border-2 border-yellow-500 rounded-md m-1 font-bold text-xl w-full py-2">
-        {"Winner: " + winner}
-      </div>
-    );
-  } else if (squares.every((square) => square !== null)) {
-    status = (
-      <div className="bg-paleteOne-300 text-white text-center border-2 border-gray-200 rounded-md m-1 font-bold text-xl w-full py-2">
-        {"Draw"}
-      </div>
-    );
-  } else {
-    status = (
-      <div className="bg-paleteOne-300/40 text-center border-2 rounded-md m-1 font-bold text-xl w-full py-2">
-        {"Next player: " + (xIsNext ? "X" : "O")}
-      </div>
-    );
-  }
+    // Se houver um vencedor, incrementa a pontuação
+    if (calculateWinner(nextSquares).winner) {
+      if (xIsNext) setXScore(xScore + 1);
+      else setOScore(oScore + 1);
+    }
+  };
+
+  // Função para reiniciar o tabuleiro e escolher aleatoriamente quem começa
+const newGame = () => {
+  setSquares(Array(9).fill(null));
+  const randomStart = Math.random() < 0.5; // 50% de chance para "X" ou "O"
+  setXIsNext(randomStart); // Define o jogador inicial aleatoriamente
+};
+
+
+  // Função para iniciar o jogo
+  const startGame = () => {
+    newGame();
+    setIsStarted(true);
+    if (isPlayingAgainstAI && !xIsNext) {
+      aiMove(); // Chama a IA para fazer a primeira jogada
+    }
+  };
+
+  // Função para reiniciar o jogo
+  const resetGame = () => {
+    newGame();
+    setIsStarted(false);
+    setIsPlayingAgainstAI(false);
+    setXScore(0);
+    setOScore(0);
+  };
+
+  const calculateBestMove = (squares, player) => {
+    const opponent = player === "X" ? "O" : "X";
+
+    // Função para calcular o vencedor
+    const getWinner = (squares) => {
+      const { winner } = calculateWinner(squares);
+      return winner;
+    };
+
+    // Função recursiva Minimax
+    const minimax = (newSquares, depth, isMaximizing, alpha, beta) => {
+      const winner = getWinner(newSquares);
+      if (winner === player) return 10 - depth;
+      if (winner === opponent) return depth - 10;
+      if (newSquares.every((square) => square !== null)) return 0;
+
+      if (isMaximizing) {
+        let bestScore = -Infinity;
+        for (let i = 0; i < newSquares.length; i++) {
+          if (newSquares[i] === null) {
+            newSquares[i] = player;
+            const score = minimax(newSquares, depth + 1, false, alpha, beta);
+            newSquares[i] = null;
+            bestScore = Math.max(score, bestScore);
+            alpha = Math.max(alpha, bestScore);
+            if (beta <= alpha) break; // Poda beta
+          }
+        }
+        return bestScore;
+      } else {
+        let bestScore = Infinity;
+        for (let i = 0; i < newSquares.length; i++) {
+          if (newSquares[i] === null) {
+            newSquares[i] = opponent;
+            const score = minimax(newSquares, depth + 1, true, alpha, beta);
+            newSquares[i] = null;
+            bestScore = Math.min(score, bestScore);
+            beta = Math.min(beta, bestScore);
+            if (beta <= alpha) break; // Poda alfa
+          }
+        }
+        return bestScore;
+      }
+    };
+
+    let bestScore = -Infinity;
+    let move;
+
+    for (let i = 0; i < squares.length; i++) {
+      if (squares[i] === null) {
+        squares[i] = player;
+        const score = minimax(squares, 0, false);
+        squares[i] = null; // Desfaz a jogada
+        if (score > bestScore) {
+          bestScore = score;
+          move = i;
+        }
+      }
+    }
+
+    return move;
+  };
+
+  // Função que faz a jogada da IA
+  const aiMove = () => {
+    if (aiDifficulty === "medium") {
+      const move = calculateBestMove(squares, "O"); // "O" é o jogador da IA
+      if (move !== undefined) {
+        handleClick(move);
+      }
+    }
+
+    if (aiDifficulty === "easy") {
+      const randomChance = Math.random();
+
+      if (randomChance < 0.7) {
+        // 70% de chance de jogar aleatoriamente
+        const emptySquares = squares
+          .map((value, index) => (value === null ? index : null))
+          .filter((index) => index !== null);
+        const randomIndex =
+          emptySquares[Math.floor(Math.random() * emptySquares.length)];
+        handleClick(randomIndex);
+      } else {
+        // 30% de chance de fazer um movimento calculado
+        const move = calculateBestMove(squares, "O");
+        handleClick(move);
+      }
+    }
+  };
+
+  // useEffect para a IA jogar após o jogador
+  useEffect(() => {
+    if (isPlayingAgainstAI && !xIsNext && isStarted) {
+      const timer = setTimeout(() => {
+        aiMove();
+      }, 500); // Tempo de espera para simular o tempo da IA
+      return () => clearTimeout(timer);
+    }
+  }, [xIsNext, isPlayingAgainstAI, isStarted, squares]);
 
   return (
     <div className="flex flex-col items-center">
-      {status}
+      {isStarted && (
+        <>
+          {/* Exibe o status do jogo (vencedor ou próximo jogador) */}
+          <div
+            className={`${
+              winner ? "bg-green-500" : isDraw ? "bg-gray-300" : "bg-white/15"
+            } text-center p-2 rounded w-full mb-2`}
+          >
+            <h2 className="font-bold text-xl">
+              {winner
+                ? `Winner: ${winner}`
+                : isDraw
+                ? "It's a Draw!"
+                : `Next player: ${xIsNext ? "X" : "O"}`}
+            </h2>
+          </div>
 
-      <div className="grid grid-cols-3 grid-rows-3">
-        {Array.isArray(squares) &&
-          squares.map((square, i) => (
-            <Square
-              key={i}
-              value={square}
-              onSquareClick={() => handleClick(i)}
-            />
-          ))}
-      </div>
-    </div>
-  );
-}
+          {/* Exibe a pontuação */}
+          <div className="flex justify-around w-full mb-4">
+            <div className="text-xl">
+              <strong>Player X: {xScore}</strong>
+            </div>
+            <div className="text-xl">
+              <strong>
+                {isPlayingAgainstAI
+                  ? "AI " + aiDifficulty.toLocaleUpperCase()
+                  : "Player"}{" "}
+                O: {oScore}
+              </strong>
+            </div>
+          </div>
 
-function calculateWinner(squares) {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
-    }
-  }
-  return null;
-}
+          {/* Tabuleiro 3x3 */}
+          <div className="grid grid-cols-3 grid-rows-3">
+            {squares.map((square, i) => (
+              <Square
+                key={i}
+                value={square}
+                onSquareClick={() => handleClick(i)}
+                isWinner={winningSquares && winningSquares.includes(i)} // Verifica se a célula faz parte da combinação vencedora
+                disabled={isPlayingAgainstAI && !xIsNext} // Desabilita se for a vez da IA
+              />
+            ))}
+          </div>
+        </>
+      )}
 
-const TicTacToe = () => {
-  const [gameId, setGameId] = useState(null);
-  const [history, setHistory] = useState([Array(9).fill(null)]);
-  const [currentMove, setCurrentMove] = useState(0);
-  const currentSquares = history[currentMove] || Array(9).fill(null);
-  const xIsNext = currentMove % 2 === 0;
+      {!isStarted && (
+        <div className="grid grid-cols-3 grid-rows-3">
+          <PreviewGame />
+        </div>
+      )}
 
-  useEffect(() => {
-    if (gameId) {
-      const gameRef = ref(rt, `tictactoe/${gameId}`);
-      onValue(gameRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          setHistory(data.history || [Array(9).fill(null)]);
-          setCurrentMove(data.currentMove || 0);
-        }
-      });
-    }
-  }, [gameId]);
-
-  function handlePlay(nextSquares) {
-    const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
-    setHistory(nextHistory);
-    setCurrentMove(nextHistory.length - 1);
-
-    if (gameId) {
-      set(ref(rt, `tictactoe/${gameId}`), {
-        history: nextHistory,
-        currentMove: nextHistory.length - 1,
-      });
-    }
-  }
-
-  function jumpTo(nextMove) {
-    setCurrentMove(nextMove);
-  }
-
-  function resetGame() {
-    const initialHistory = [Array(9).fill(null)];
-    setHistory(initialHistory);
-    setCurrentMove(0);
-
-    if (gameId) {
-      set(ref(rt, `tictactoe/${gameId}`), {
-        history: initialHistory,
-        currentMove: 0,
-      });
-    }
-  }
-
-  function startGame() {
-    if (!gameId) {
-      const newGameRef = generateRandomId(25); // Irá gerar um ID aleatório de 25 caracteres
-
-      push(ref(rt, "tictactoe"));
-
-      set(ref(rt, `tictactoe/${newGameRef}`), {
-        history: [Array(9).fill(null)],
-        currentMove: 0,
-        xIsNext,
-      });
-      setGameId(newGameRef);
-    } else {
-      resetGame();
-    }
-  }
-
-  function joinGame(id) {
-    setGameId(id);
-  }
-
-  const moves = history.map((squares, move) => {
-    let description;
-    if (move > 0) {
-      description = "Move #" + move;
-    }
-    return (
-      <li key={move}>
+      <div className="mt-4 space-x-4 flex items-center">
         <button
-          className="bg-paleteOne-300/20 text-center border-2 rounded-md m-1 font-medium text-sm"
-          onClick={() => jumpTo(move)}
+          className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded"
+          onClick={isStarted ? newGame : startGame}
         >
-          {description}
+          {!isStarted ? "Start Game" : "New Game"}
         </button>
-      </li>
-    );
-  });
 
-  return (
-    <div
-      className={`flex flex-col items-center absolute bottom-1/2 end-1/2 translate-x-1/2 translate-y-1/2 h-screen pt-28 `}
-    >
-      <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+        {/* Botão para jogar contra a IA */}
+        {!isStarted && (
+          <div className="flex divide-x divide-black">
+            <button
+              className="bg-darkblue-400 hover:bg-darkblue-300 text-white px-4 py-2 rounded-s-lg"
+              onClick={() => {
+                setIsPlayingAgainstAI(true);
+                startGame();
+              }}
+            >
+              {"Play Against AI"}
+            </button>
 
-      <div className="flex flex-col items-center mt-4">
-        <button
-          onClick={startGame}
-          className="bg-white hover:bg-paleteOne-200 text-center border-2 rounded-md m-1 font-bold text-xl px-4 py-2"
-        >
-          {gameId ? "Restart Game" : "Start Game"}
-        </button>
+            <select
+              className="w-fit bg-darkblue-400 hover:bg-darkblue-300 active:bg-darkblue-100 text-white px-1 py-2 rounded-e-lg"
+              value={aiDifficulty}
+              onChange={(e) => setAiDifficulty(e.target.value)}
+            >
+              <option value="medium">Medium</option>
+              <option value="easy">Easy</option>
+            </select>
+          </div>
+        )}
+
+        {isStarted && (
+          <button
+            className="bg-red-300 hover:bg-red-500 text-white px-4 py-2 rounded "
+            onClick={resetGame}
+          >
+            {"Reset Game"}
+          </button>
+        )}
       </div>
-
-      <div className="flex flex-col items-center mt-4">
-        <input
-          type="text"
-          placeholder="Enter Game ID"
-          className="border rounded-md p-2"
-          onBlur={(e) => joinGame(e.target.value)}
-        />
-      </div>
-      {/* <ol className="absolute top-2/3 end-0">{moves}</ol> */}
     </div>
   );
 };
 
+// Exporta o componente TicTacToe
 export default TicTacToe;

@@ -8,6 +8,7 @@ import {
   getDoc,
   addDoc,
   updateDoc,
+  setDoc,
 } from "firebase/firestore";
 
 // hooks
@@ -48,18 +49,12 @@ export const useFirestore = () => {
   }
 
   // functions - sets
-  const setDocument = async (collect = "", data = {}) => {
+  const setDocument = async ({collect = "", data = {}}) => {
     validate("start");
     let systemErrorMessage;
 
     try {
       const res = await addDoc(collection(db, collect), data);
-
-      //se a coleção for congregacoes, fazer um update no documento com o id do documento
-      if (collect === "congregacoes") {
-        const dat = { id: res.id, ...data };
-        await updateDoc(doc(db, collect, res.id), dat);
-      }
 
       validate("end");
       return res;
@@ -69,6 +64,22 @@ export const useFirestore = () => {
 
       systemErrorMessage = "Ocorreu um erro, por favor tenta mais tarde.";
 
+      setError(systemErrorMessage);
+    }
+    validate("end");
+  };
+
+  const setDocWithId = async ({ collect, id, data }) => {
+    validate("start");
+    let systemErrorMessage;
+
+    try {
+      const res = await setDoc(doc(db, collect, id), data);
+      return res;
+    } catch (error) {
+      console.log(error.messeger);
+      console.log(typeof error.messeger);
+      systemErrorMessage = "Ocorreu um erro, por favor tenta mais tarde.";
       setError(systemErrorMessage);
     }
     validate("end");
@@ -95,11 +106,11 @@ export const useFirestore = () => {
   };
 
   // functions - gets
-  const getDocId = async (collect, documentId) => {
+  const getDocId = async ({ collect, id }) => {
     validate("start");
     let systemErrorMessage;
     try {
-      const docRef = doc(db, collect, documentId);
+      const docRef = doc(db, collect, id);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
@@ -189,10 +200,10 @@ export const useFirestore = () => {
     }
   };
 
-  const getCollectionWhere = async (
+  const getCollectionWhere = async ({
     collect,
-    whr = { attr: "", comp: "", value: "" }
-  ) => {
+    whr = { attr: "", comp: "", value: "" },
+  }) => {
     //where {attr, comp, value}
     validate("start");
 
@@ -236,6 +247,7 @@ export const useFirestore = () => {
     loading,
     //sets
     setDocument,
+    setDocWithId,
     //functions - updates
     updateDocument,
     //functions - gets

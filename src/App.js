@@ -4,6 +4,7 @@ import Main from "./pages/Main";
 import Play from "./games/Play";
 import Search from "./pages/Search";
 import Game from "./pages/Game";
+import { AuthProvider } from "./context/authContext";
 
 function App() {
   return (
@@ -11,15 +12,15 @@ function App() {
       <Main />
     </div> */
     <>
-      {/* <AuthProvider value={{ user }}> */}
-      <BrowserRouter>
-        <div className="flex">
-          <Routes>
-            {/* <Route
+      <AuthProvider>
+        <BrowserRouter>
+          <div className="flex">
+            <Routes>
+              {/* <Route
                 path="/"
                 element={user ? <Home /> : <Navigate to="/login" />}
               /> */}
-            {/* <Route
+              {/* <Route
                 path="/login"
                 element={!user ? <Login /> : <Navigate to="/" />}
               />
@@ -37,14 +38,14 @@ function App() {
                   )
                 }
               /> */}
-            <Route path="/" element={<Main />} />
-            <Route path="/play/:gameId" element={<Play />} />
-            <Route path="/game/:id" element={<Game />} />
-            <Route path="/search/:text" element={<Search />} />
-          </Routes>
-        </div>
-      </BrowserRouter>
-      {/* </AuthProvider> */}
+              <Route path="/" element={<Main />} />
+              <Route path="/play/:gameId" element={<Play />} />
+              <Route path="/game/:id" element={<Game />} />
+              <Route path="/search/:text" element={<Search />} />
+            </Routes>
+          </div>
+        </BrowserRouter>
+      </AuthProvider>
     </>
   );
 }

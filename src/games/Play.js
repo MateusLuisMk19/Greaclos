@@ -3,10 +3,10 @@ import { AiFillHome } from "react-icons/ai";
 import { useParams } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import { SiGamedeveloper } from "react-icons/si";
-import TicTacToe  from "./TicTacToe";
+import TicTacToe from "./TicTacToe";
 
 const Play = () => {
-  const { gameId } = useParams();
+  const { gameid } = useParams();
 
   const [dropBar, setDropBar] = useState("absolute end-full");
   const handleDropBar = () => {
@@ -27,7 +27,7 @@ const Play = () => {
     },
     {
       label: "Leave Game",
-      component: `/game/${gameId}`,
+      component: `/game/${gameid}`,
       icon: <AiFillHome size={30} />,
       last: true,
     },
@@ -35,12 +35,12 @@ const Play = () => {
 
   const MyGames = [
     {
-      gameId: "XGT8Y1ckAi8R4Xm0sItl",
+      gameid: "XGT8Y1ckAi8R4Xm0sItl",
       name: "TicTacToe",
       component: TicTacToe,
     },
     {
-      gameId: "XGT8Y1ckAi8R4Xm0sItl",
+      gameid: "XGT8Y1ckAi8R4Xm0sItl",
       name: "TicTacToe 2",
       component: `Modal`,
     },
@@ -63,8 +63,8 @@ const Play = () => {
 
       <div className="w-full h-screen absolute bg-orange-500 flex justify-center items-center -z-10">
         {MyGames.map((game, idx) =>
-          game.gameId === gameId ? (
-            <game.component key={idx} gameId={gameId} />
+          game.gameid === gameid ? (
+            <game.component key={idx} gameid={gameid} />
           ) : (
             ""
           )

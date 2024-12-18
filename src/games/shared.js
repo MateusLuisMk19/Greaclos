@@ -56,29 +56,39 @@ function PreviewGame() {
 }
 
 // Função para calcular o vencedor
-function calculateWinner(squares) {
-  // Combinações possíveis para vencer
+export const calculateWinner = (squares) => {
+  // Verifica se squares é undefined ou null
+  if (!squares) {
+    return { winner: null, winningSquares: null };
+  }
+
   const lines = [
-    [0, 1, 2], // Linha superior
-    [3, 4, 5], // Linha do meio
-    [6, 7, 8], // Linha inferior
-    [0, 3, 6], // Coluna da esquerda
-    [1, 4, 7], // Coluna do meio
-    [2, 5, 8], // Coluna da direita
-    [0, 4, 8], // Diagonal da esquerda para direita
-    [2, 4, 6], // Diagonal da direita para esquerda
+    [0, 1, 2], // horizontal
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6], // vertical
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8], // diagonal
+    [2, 4, 6],
   ];
 
-  // Verifica cada combinação
   for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i]; // Desestrutura a combinação
-    // Se os três valores da combinação forem iguais e não forem nulos, retornamos o vencedor
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return { winner: squares[a], winningSquares: lines[i] }; // Retorna vencedor e células vencedoras
+    const [a, b, c] = lines[i];
+    if (
+      squares[a] && 
+      squares[a] === squares[b] && 
+      squares[a] === squares[c]
+    ) {
+      return {
+        winner: squares[a],
+        winningSquares: lines[i]
+      };
     }
   }
-  return { winner: null, winningSquares: null }; // Se não houver vencedor, retorna null
-}
+
+  return { winner: null, winningSquares: null };
+};
 
 // Componente Square que representa uma célula do tabuleiro
 function Square({ value, onSquareClick, isWinner, disabled }) {
@@ -102,4 +112,14 @@ function Square({ value, onSquareClick, isWinner, disabled }) {
   );
 }
 
-export { generateRandomId, PreviewGame, calculateWinner, Square };
+const objToArr = (obj) => {
+  //percorre o objeto e cria um array com os indices correspondentes as chaves do objeto e valor correspondente ao valor do objeto, se o objeto nao possuir o indice, ele cria com null
+  const arr = [];
+  for (let i = 0; i < 9; i++) {
+      arr[i] = obj[i] || null;
+  }
+  return arr;
+}
+
+
+export { generateRandomId, PreviewGame, Square, objToArr };

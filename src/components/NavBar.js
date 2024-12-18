@@ -6,6 +6,7 @@ import { Modal, Notifications } from "./shared";
 import { TextBox } from "./inputs";
 import { GameForm } from "./MyForms";
 import { useFirestore } from "../hooks/useFirestore";
+import useStorage from "../hooks/useStorage";
 
 const NavBar = ({ pages, custom, fake = false, play = false, onClick }) => {
   const [showSettings, setShowSettings] = useState(false);
@@ -14,11 +15,12 @@ const NavBar = ({ pages, custom, fake = false, play = false, onClick }) => {
   const [textBox, setTextBox] = useState("");
   const [secretConfig, setSecretConfig] = useState(false);
 
-  const { setDocument } = useFirestore();
+  const { setDocument, updateDocument } = useFirestore();
+  const { uploadFile } = useStorage();
 
   const Default_Styl = `${
     isOpen ? "h-screen" : "h-fit md:h-screen"
-  } bg-gradient-to-b from-[#3E1F47] to-[#272640] z-40 w-full md:w-full`; // Adicionada responsividade
+  } bg-gradient-to-b from-[#3E1F47] to-[#272640] z-40 w-full md:w-fit`; // Adicionada responsividade
   const Play_Styl =
     "h-screen bg-gradient-to-b from-[#3E1F47] to-[#272640] z-40 w-full md:w-full " +
     custom;
@@ -50,10 +52,7 @@ const NavBar = ({ pages, custom, fake = false, play = false, onClick }) => {
 
   const handleGameSubmit = async (gameData) => {
     const game = {
-      cover: {
-        background: gameData.cover.background,
-        profile: gameData.cover.profile,
-      },
+      cover: {},
       description: gameData.description,
       info: {
         cpu: gameData.cpu,
@@ -64,10 +63,27 @@ const NavBar = ({ pages, custom, fake = false, play = false, onClick }) => {
       name: gameData.name,
     };
 
-    console.log(game);
+    const gameSetted = await setDocument({ collect: "games", data: game });
 
-    // const res = await setDocument({ collect: "games", data: gameData });
-    // console.log(res);
+    const profieUrl = await uploadFile(
+      gameData.profile,
+      `games/${gameSetted.id}/cover/profile.png`
+    );
+    const backgroundUrl = await uploadFile(
+      gameData.background,
+      `games/${gameSetted.id}/cover/background.png`
+    );
+
+    const cover = {
+      background: backgroundUrl,
+      profile: profieUrl,
+    };
+
+    await updateDocument({
+      collect: "games",
+      docu: gameSetted.id,
+      data: { cover },
+    });
   };
 
   return (

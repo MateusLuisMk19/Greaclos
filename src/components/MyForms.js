@@ -99,11 +99,13 @@ export const GameForm = ({ onSubmit }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [backgroundPreview, setBackgroundPreview] = useState(null);
+  const [myBackgroundFile, setMyBackgroundFile] = useState(null);
   const [coverPreview, setCoverPreview] = useState(null);
+  const [myCoverFile, setMyCoverFile] = useState(null);
   const [videoPreview, setVideoPreview] = useState(null);
   const [difficulty, setDifficulty] = useState(0);
-  const [maxPlayers, setMaxPlayers] = useState("");
-  const [minPlayers, setMinPlayers] = useState("");
+  const [maxPlayers, setMaxPlayers] = useState(2);
+  const [minPlayers, setMinPlayers] = useState(1);
   const [supportsCPU, setSupportsCPU] = useState(false);
 
   const handleFileChange = (setPreview, fileType) => (event) => {
@@ -113,21 +115,43 @@ export const GameForm = ({ onSubmit }) => {
         setPreview(URL.createObjectURL(file));
       } else {
         const reader = new FileReader();
+
         reader.onloadend = () => {
           setPreview(reader.result);
         };
+
         reader.readAsDataURL(file);
+        if (fileType === "cover") {
+          setMyCoverFile(file);
+        } else if (fileType === "background") {
+          setMyBackgroundFile(file);
+        }
       }
     }
   };
+
+  /* const handlePreview = (file) => {
+    if (file) {
+      const reader = new FileReader();
+
+      reader.addEventListener("load", (e) => {
+        const readerTarget = e.target;
+
+        setImage(<Card.Img src={readerTarget.result} />);
+        setMyFile(file);
+      });
+
+      reader.readAsDataURL(file);
+    }
+  }; */
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit({
       name,
       description,
-      backgroundPreview,
-      coverPreview,
+      background: myBackgroundFile,
+      profile: myCoverFile,
       //   videoPreview,
       difficulty,
       maxPlayers,
@@ -258,14 +282,14 @@ export const GameForm = ({ onSubmit }) => {
 
       <ImageUploadField
         label="Imagem de Fundo"
-        onFileChange={handleFileChange(setBackgroundPreview, "image")}
+        onFileChange={handleFileChange(setBackgroundPreview, "background")}
         preview={backgroundPreview}
         onRemove={() => setBackgroundPreview(null)}
       />
 
       <ImageUploadField
         label="Imagem de Capa"
-        onFileChange={handleFileChange(setCoverPreview, "image")}
+        onFileChange={handleFileChange(setCoverPreview, "cover")}
         preview={coverPreview}
         onRemove={() => setCoverPreview(null)}
       />

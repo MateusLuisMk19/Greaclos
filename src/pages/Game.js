@@ -23,6 +23,7 @@ const Game = () => {
   const { id } = useParams();
   const [favorite, setFavorite] = useState(false);
   const [gameNow, setGameNow] = useState({});
+  const [pubs, setPubs] = useState([]);
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
@@ -34,8 +35,10 @@ const Game = () => {
     const fetchGame = async () => {
       setLoading(true);
       try {
-        const game = await getDocId("games", id);
+        const game = await getDocId({ collect: "games", id });
+        const pubs = await getDocId({ collect: "pubs", id });
         setGameNow(game);
+        setPubs(pubs.urls);
       } catch (error) {
         setError(true);
       } finally {
@@ -79,26 +82,25 @@ const Game = () => {
             <TopBar page="game" float classes="mt-2" />
 
             <div className="h-2/3 relative z-10">
-              {/* Se quiser usar a imagem em vez do vídeo, descomente abaixo */}
-              {gameNow?.pubs && (
+              {/* {pubs && (
                 <>
-                  {gameNow?.pubs.length === 0 && (
+                  {pubs.urls.length === 0 && (
                     <img
                       className="w-full absolute -top-1/2 pub-game"
-                      src={gameNow.cover?.background}
+                      src={pubs.urls.map((url) => url)}
                       alt="Game Cover"
                     />
                   )}
                 </>
-              )}
+              )} */}
 
-              {gameNow?.pubs && (
+              {pubs && (
                 <video
                   muted
                   autoPlay
                   loop
                   className="w-full pub-game"
-                  src={gameNow.pubs[0]?.url}
+                  src={pubs.map((url) => url)}
                   type="video/mp4"
                 >
                   Sorry, your browser doesn't support embedded videos, but don't
@@ -216,7 +218,7 @@ const GameDetails = ({ info, rate }) => {
           isOpen={openReviews}
           close={() => setOpenReviews(!openReviews)}
         >
-          {rate.reviews.map((review,idx) => (
+          {rate.reviews.map((review, idx) => (
             <div key={idx} className="w-full flex  space-2 rounded-lg">
               <button className="w-14 h-14 rounded-full bg-blue-300">o</button>
               <div className="w-full mx-2">
